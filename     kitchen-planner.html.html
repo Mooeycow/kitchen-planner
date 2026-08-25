@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Kitchen Planner">
+<meta name="theme-color" content="#dfe8dc">
+
+<title>Kitchen Inventory & Dinner Planner</title>
+
+<style>
+    :root {
+        --sage: #9caf91;
+        --sage-dark: #718367;
+        --sage-light: #e5ecdf;
+        --beige: #f5f0e6;
+        --cream: #fbf9f4;
+        --brown: #665f53;
+        --dark: #3f4039;
+        --white: #ffffff;
+        --red: #c96d68;
+        --red-light: #f8e2df;
+        --green: #668b67;
+        --green-light: #e2efe2;
+        --border: #ded9cd;
+        --shadow: 0 3px 12px rgba(80,75,60,.08);
+    }
+
+    * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        margin: 0;
+        background: var(--beige);
+        color: var(--dark);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+                     "Helvetica Neue", Arial, sans-serif;
+        font-size: 16px;
+    }
+
+    header {
+        background: var(--sage);
+        padding: 24px 28px;
+        color: white;
+    }
+
+    header h1 {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    header p {
+        margin: 6px 0 0;
+        opacity: .9;
+        font-size: 15px;
+    }
+
+    .app {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 22px;
+    }
+
+    /* Main dual-column layout */
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 22px;
+        align-items: start;
+    }
+
+    .panel {
+        background: var(--cream);
+        border-radius: 18px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+        border: 1px solid rgba(120,110,90,.08);
+    }
+
+    .panel-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 18px;
+    }
+
+    .panel-title h2 {
+        margin: 0;
+        font-size: 22px;
+    }
+
+    /* Location toggle */
+
+    .location-toggle {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        background: var(--sage-light);
+        border-radius: 13px;
+        padding: 4px;
+        margin-bottom: 20px;
+    }
+
+    .location-toggle button {
+        border: none;
+        background: transparent;
+        color: var(--sage-dark);
+        min-height: 48px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        cursor: pointer;
+    }
+
+    .location-toggle button.active {
+        background: var(--sage-dark);
+        color: white;
+    }
+
+    /* Forms */
+
+    input, select, button {
+        font: inherit;
+    }
+
+    input, select {
+        width: 100%;
+        min-height: 48px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: white;
+        color: var(--dark);
+        outline: none;
+    }
+
+    input:focus, select:focus {
+        border-color: var(--sage-dark);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1.4fr .6fr .8fr .9fr auto;
+        gap: 8px;
+        margin-bottom: 20px;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn,
+    .small-btn {
+        border: none;
+        border-radius: 10px;
+        min-height: 46px;
+        padding: 9px 15px;
+        cursor: pointer;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .primary-btn {
+        background: var(--sage-dark);
+        color: white;
+    }
+
+    .secondary-btn {
+        background: var(--sage-light);
+        color: var(--sage-dark);
+    }
+
+    .danger-btn {
+        background: var(--red-light);
+        color: var(--red);
+    }
+
+    .small-btn {
+        min-height: 38px;
+        padding: 7px 12px;
+        font-size: 14px;
+    }
+
+    button:active {
+        transform: scale(.98);
+    }
+
+    /* Category sections */
+
+    .category {
+        margin-bottom: 22px;
+    }
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 7px;
+        margin-bottom: 8px;
+    }
+
+    .category-header h3 {
+        margin: 0;
+        color: var(--sage-dark);
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+    }
+
+    .category-count {
+        color: #8d887c;
+        font-size: 13px;
+    }
+
+    .inventory-item {
+        display: grid;
+        grid-template-columns: minmax(100px, 1fr) auto auto auto;
+        align-items: center;
+        gap: 9px;
+        padding: 10px 0;
+        border-bottom: 1px solid #ebe7de;
+    }
+
+    .item-name {
+        font-weight: 600;
+    }
+
+    .expiry {
+        font-size: 12px;
+        color: #898477;
+        margin-top: 3px;
+    }
+
+    .expiry.expired {
+        color: var(--red);
+        font-weight: 600;
+    }
+
+    .quantity {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .quantity button {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        border: none;
+        background: var(--sage-light);
+        color: var(--sage-dark);
+        font-size: 22px;
+        cursor: pointer;
+    }
+
+    .quantity span {
+        min-width: 25px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .delete-btn {
+        border: none;
+        background: transparent;
+        color: #aaa398;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 8px;
+    }
+
+    .empty {
+        color: #999286;
+        font-style: italic;
+        padding: 12px 0;
+    }
+
+    /* Recipes */
+
+    .recipe-form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        margin-bottom: 12px;
+    }
+
+    .ingredient-row {
+        display: grid;
+        grid-template-columns: 1fr .45fr auto;
+        gap: 7px;
+        margin-bottom: 7px;
+    }
+
+    .recipe-card {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        padding: 14px;
+        margin-top: 10px;
+    }
+
+    .recipe-card-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .recipe-card h4 {
+        margin: 0;
+        font-size: 17px;
+    }
+
+    .recipe-ingredients {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: #777165;
+    }
+
+    /* Planner */
+
+    .day {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 13px;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .day-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 9px;
+    }
+
+    .day-header strong {
+        color: var(--sage-dark);
+    }
+
+    .meal-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+    }
+
+    .meal-status {
+        margin-top: 10px;
+        padding: 9px 11px;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    .meal-status.good {
+        background: var(--green-light);
+        color: var(--green);
+    }
+
+    .meal-status.missing {
+        background: var(--red-light);
+        color: var(--red);
+    }
+
+    .ingredient-check {
+        display: block;
+        margin: 3px 0;
+    }
+
+    .ingredient-check.good {
+        color: var(--green);
+    }
+
+    .ingredient-check.missing {
+        color: var(--red);
+        font-weight: 600;
+    }
+
+    .cooked {
+        opacity: .6;
+    }
+
+    .cooked-label {
+        color: var(--green);
+        font-size: 13px;
+        font-weight: 600;
+        margin-top: 7px;
+    }
+
+    /* Shopping list */
+
+    .shopping-list {
+        margin-top: 22px;
+    }
+
+    .shopping-list h3 {
+        margin: 0 0 12px;
+        font-size: 18px;
+    }
+
+    .shopping-item {
+        background: var(--red-light);
+        color: #8f4e4a;
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 7px;
+        font-weight: 600;
+    }
+
+    .shopping-empty {
+        background: var(--green-light);
+        color: var(--green);
+        padding: 12px;
+        border-radius: 10px;
+    }
+
+    /* Section separator */
+
+    .section {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid var(--border);
+    }
+
+    .section h3 {
+        margin-top: 0;
+    }
+
+    /* Tablet / iPad portrait */
+
+    @media (max-width: 950px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .form-grid button {
+            grid-column: span 2;
+        }
+    }
+
+    /* Phones */
+
+    @media (max-width: 600px) {
+        header {
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 23px;
+        }
+
+        .app {
+            padding: 12px;
+        }
+
+        .panel {
+            padding: 15px;
+            border-radius: 14px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-grid button {
+            grid-column: auto;
+        }
+
+        .inventory-item {
+            grid-template-columns: 1fr auto;
+        }
+
+        .inventory-item .quantity {
+            grid-column: 2;
+            grid-row: 1 / span 2;
+        }
+
+        .inventory-item .delete-btn {
+            grid-column: 1;
+            grid-row: 2;
+            justify-self: start;
+        }
+
+        .meal-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌿 Kitchen Planner</h1>
+    <p>Inventory · Recipes · Weekly Dinners</p>
+</header>
+
+<div class="app">
+
+    <div class="main-grid">
+
+        <!-- ================= INVENTORY ================= -->
+
+        <section class="panel">
+
+            <div class="panel-title">
+                <h2>Inventory</h2>
+            </div>
+
+            <div class="location-toggle">
+                <button class="active" onclick="switchLocation('Pantry', this)">Pantry</button>
+                <button onclick="switchLocation('Freezer', this)">Freezer</button>
+                <button onclick="switchLocation('Fridge', this)">Fridge</button>
+            </div>
+
+            <div class="form-grid">
+
+                <input
+                    id="itemName"
+                    type="text"
+                    placeholder="Item name">
+
+                <input
+                    id="itemQty"
+                    type="number"
+                    min="0"
+                    step="0.1"
+                    value="1"
+                    placeholder="Qty">
+
+                <input
+                    id="itemExpiry"
+                    type="date">
+
+                <select id="itemCategory">
+                    <option>Dairy</option>
+                    <option>Spices</option>
+                    <option>Vegetables</option>
+                    <option>Grains</option>
+                    <option>Meat</option>
+                    <option>Canned Goods</option>
+                    <option>Other</option>
+                </select>
+
+                <button class="primary-btn" onclick="addItem()">
+                    + Add Item
+                </button>
+
+            </div>
+
+            <div id="inventoryList"></div>
+
+        </section>
+
+
+        <!-- ================= RIGHT COLUMN ================= -->
+
+        <section class="panel">
+
+            <!-- RECIPES -->
+
+            <div class="panel-title">
+                <h2>Recipes</h2>
+            </div>
+
+            <div class="recipe-form">
+                <input
+                    id="recipeName"
+                    type="text"
+                    placeholder="Recipe name">
+
+                <button class="primary-btn" onclick="startRecipe()">
+                    + Recipe
+                </button>
+            </div>
+
+            <div id="recipeBuilder"></div>
+
+            <div id="recipesList"></div>
+
+
+            <!-- DINNER PLANNER -->
+
+            <div class="section">
+
+                <div class="panel-title">
+                    <h2>Weekly Dinner Planner</h2>
+                </div>
+
+                <div id="planner"></div>
+
+            </div>
+
+
+            <!-- SHOPPING LIST -->
+
+            <div class="shopping-list">
+
+                <h3>🛒 Shopping List</h3>
+
+                <div id="shoppingList"></div>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DATA
+========================================================= */
+
+const categories = [
+    "Dairy",
+    "Spices",
+    "Vegetables",
+    "Grains",
+    "Meat",
+    "Canned Goods",
+    "Other"
+];
+
+const locations = [
+    "Pantry",
+    "Freezer",
+    "Fridge"
+];
+
+const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday"
+];
+
+let data = JSON.parse(
+    localStorage.getItem("kitchenPlannerData")
+) || {
+    inventory: [],
+    recipes: [],
+    planner: {},
+    cooked: {}
+};
+
+let currentLocation = "Pantry";
+
+let buildingRecipe = null;
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+function save() {
+    localStorage.setItem(
+        "kitchenPlannerData",
+        JSON.stringify(data)
+    );
+}
+
+
+/* =========================================================
+   INVENTORY
+========================================================= */
+
+function switchLocation(location, button) {
+
+    currentLocation = location;
+
+    document
+        .querySelectorAll(".location-toggle button")
+        .forEach(btn => btn.classList.remove("active"));
+
+    button.classList.add("active");
+
+    renderInventory();
+}
+
+
+function addItem() {
+
+    const name = document
+        .getElementById("itemName")
+        .value
+        .trim();
+
+    const quantity = parseFloat(
+        document.getElementById("itemQty").value
+    );
+
+    const expiry = document
+        .getElementById("itemExpiry")
+        .value;
+
+    const category = document
+        .getElementById("itemCategory")
+        .value;
+
+    if (!name || isNaN(quantity)) {
+        alert("Please enter an item name and quantity.");
+        return;
+    }
+
+    data.inventory.push({
+        id: Date.now(),
+        name,
+        quantity,
+        expiry,
+        category,
+        location: currentLocation
+    });
+
+    save();
+
+    document.getElementById("itemName").value = "";
+    document.getElementById("itemQty").value = "1";
+    document.getElementById("itemExpiry").value = "";
+
+    renderInventory();
+    renderPlanner();
+}
+
+
+function changeQuantity(id, amount) {
+
+    const item = data.inventory.find(
+        item => item.id === id
+    );
+
+    if (!item) return;
+
+    item.quantity = Math.max(
+        0,
+        Number(item.quantity) + amount
+    );
+
+    save();
+
+    renderInventory();
+    renderPlanner();
+}
+
+
+function deleteItem(id) {
+
+    data.inventory = data.inventory.filter(
+        item => item.id !== id
+    );
+
+    save();
+
+    renderInventory();
+    renderPlanner();
+}
+
+
+/* =========================================================
+   INVENTORY RENDER
+========================================================= */
+
+function renderInventory() {
+
+    const container =
+        document.getElementById("inventoryList");
+
+    container.innerHTML = "";
+
+    const items = data.inventory.filter(
+        item => item.location === currentLocation
+    );
+
+    if (!items.length) {
+        container.innerHTML =
+            `<div class="empty">
+                No items in the ${currentLocation.toLowerCase()} yet.
+             </div>`;
+        return;
+    }
+
+    categories.forEach(category => {
+
+        const categoryItems = items.filter(
+            item => item.category === category
+        );
+
+        if (!categoryItems.length) return;
+
+        const section = document.createElement("div");
+        section.className = "category";
+
+        section.innerHTML = `
+            <div class="category-header">
+                <h3>${escapeHTML(category)}</h3>
+                <span class="category-count">
+                    ${categoryItems.length}
+                </span>
+            </div>
+        `;
+
+        categoryItems.forEach(item => {
+
+            const row = document.createElement("div");
+            row.className = "inventory-item";
+
+            let expiryText = "";
+
+            if (item.expiry) {
+
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
+                const expiryDate =
+                    new Date(item.expiry + "T00:00:00");
+
+                const expired =
+                    expiryDate < today;
+
+                expiryText = `
+                    <div class="expiry ${expired ? "expired" : ""}">
+                        ${expired ? "Expired · " : "Expires · "}
+                        ${formatDate(item.expiry)}
+                    </div>
+                `;
+            }
+
+            row.innerHTML = `
+                <div>
+                    <div class="item-name">
+                        ${escapeHTML(item.name)}
+                    </div>
+                    ${expiryText}
+                </div>
+
+                <div class="quantity">
+                    <button
+                        onclick="changeQuantity(${item.id}, -1)">
+                        −
+                    </button>
+
+                    <span>${item.quantity}</span>
+
+                    <button
+                        onclick="changeQuantity(${item.id}, 1)">
+                        +
+                    </button>
+                </div>
+
+                <button
+                    class="delete-btn"
+                    title="Delete"
+                    onclick="deleteItem(${item.id})">
+                    ×
+                </button>
+            `;
+
+            section.appendChild(row);
+        });
+
+        container.appendChild(section);
+    });
+}
+
+
+/* =========================================================
+   RECIPES
+========================================================= */
+
+function startRecipe() {
+
+    const name = document
+        .getElementById("recipeName")
+        .value
+        .trim();
+
+    if (!name) {
+        alert("Please enter a recipe name.");
+        return;
+    }
+
+    buildingRecipe = {
+        name,
+        ingredients: []
+    };
+
+    document.getElementById("recipeName").value = "";
+
+    renderRecipeBuilder();
+}
+
+
+function renderRecipeBuilder() {
+
+    const container =
+        document.getElementById("recipeBuilder");
+
+    if (!buildingRecipe) {
+        container.innerHTML = "";
+        return;
+    }
+
+    container.innerHTML = `
+        <div class="recipe-card">
+
+            <h4>
+                ${escapeHTML(buildingRecipe.name)}
+            </h4>
+
+            <p style="color:#888;margin:7px 0 12px;">
+                Add the ingredients and quantities required.
+            </p>
+
+            <div id="ingredientRows"></div>
+
+            <button
+                class="secondary-btn small-btn"
+                onclick="addIngredientRow()">
+                + Ingredient
+            </button>
+
+            <button
+                class="primary-btn small-btn"
+                style="margin-left:5px;"
+                onclick="saveRecipe()">
+                Save Recipe
+            </button>
+
+            <button
+                class="danger-btn small-btn"
+                style="margin-left:5px;"
+                onclick="cancelRecipe()">
+                Cancel
+            </button>
+
+        </div>
+    `;
+
+    addIngredientRow();
+}
+
+
+function addIngredientRow() {
+
+    const container =
+        document.getElementById("ingredientRows");
+
+    if (!container) return;
+
+    const row = document.createElement("div");
+    row.className = "ingredient-row";
+
+    row.innerHTML = `
+        <input
+            class="ingredient-name"
+            type="text"
+            placeholder="e.g. Chicken Breasts">
+
+        <input
+            class="ingredient-qty"
+            type="number"
+            min="0.1"
+            step="0.1"
+            value="1"
+            placeholder="Qty">
+
+        <button
+            class="danger-btn small-btn"
+            onclick="this.parentElement.remove()">
+            ×
+        </button>
+    `;
+
+    container.appendChild(row);
+}
+
+
+function saveRecipe() {
+
+    const names =
+        document.querySelectorAll(".ingredient-name");
+
+    const quantities =
+        document.querySelectorAll(".ingredient-qty");
+
+    const ingredients = [];
+
+    names.forEach((input, index) => {
+
+        const name = input.value.trim();
+        const quantity =
+            parseFloat(quantities[index].value);
+
+        if (name && !isNaN(quantity)) {
+
+            ingredients.push({
+                name,
+                quantity
+            });
+        }
+    });
+
+    if (!ingredients.length) {
+        alert("Please add at least one ingredient.");
+        return;
+    }
+
+    data.recipes.push({
+        id: Date.now(),
+        name: buildingRecipe.name,
+        ingredients
+    });
+
+    buildingRecipe = null;
+
+    save();
+
+    renderRecipeBuilder();
+    renderRecipes();
+    renderPlanner();
+}
+
+
+function cancelRecipe() {
+
+    buildingRecipe = null;
+
+    renderRecipeBuilder();
+}
+
+
+function deleteRecipe(id) {
+
+    data.recipes = data.recipes.filter(
+        recipe => recipe.id !== id
+    );
+
+    /* Remove deleted recipe from planner */
+
+    days.forEach(day => {
+
+        if (data.planner[day] === id) {
+            delete data.planner[day];
+        }
+
+    });
+
+    save();
+
+    renderRecipes();
+    renderPlanner();
+}
+
+
+function renderRecipes() {
+
+    const container =
+        document.getElementById("recipesList");
+
+    container.innerHTML = "";
+
+    if (!data.recipes.length) {
+        container.innerHTML =
+            `<div class="empty">
+                No recipes added yet.
+             </div>`;
+        return;
+    }
+
+    data.recipes.forEach(recipe => {
+
+        const card =
+            document.createElement("div");
+
+        card.className = "recipe-card";
+
+        card.innerHTML = `
+            <div class="recipe-card-header">
+
+                <h4>
+                    ${escapeHTML(recipe.name)}
+                </h4>
+
+                <button
+                    class="danger-btn small-btn"
+                    onclick="deleteRecipe(${recipe.id})">
+                    Delete
+                </button>
+
+            </div>
+
+            <ul class="recipe-ingredients">
+
+                ${recipe.ingredients.map(ingredient => `
+                    <li>
+                        ${ingredient.quantity}
+                        ×
+                        ${escapeHTML(ingredient.name)}
+                    </li>
+                `).join("")}
+
+            </ul>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+
+/* =========================================================
+   INVENTORY CALCULATION
+========================================================= */
+
+/*
+   Inventory is combined across Pantry, Freezer and Fridge.
+   This means recipes do not care where an ingredient lives.
+*/
+
+function getInventoryAmount(ingredientName) {
+
+    return data.inventory
+        .filter(item =>
+            normalise(item.name) === normalise(ingredientName)
+        )
+        .reduce(
+            (total, item) =>
+                total + Number(item.quantity),
+            0
+        );
+}
+
+
+/* =========================================================
+   PLANNER
+========================================================= */
+
+function renderPlanner() {
+
+    const container =
+        document.getElementById("planner");
+
+    container.innerHTML = "";
+
+    days.forEach(day => {
+
+        const dayBox =
+            document.createElement("div");
+
+        dayBox.className = "day";
+
+        const selectedRecipeId =
+            data.planner[day] || "";
+
+        const recipe =
+            data.recipes.find(
+                r => r.id == selectedRecipeId
+            );
+
+        const cooked =
+            data.cooked[day] === true;
+
+        dayBox.innerHTML = `
+            <div class="day-header">
+                <strong>${day}</strong>
+
+                ${
+                    recipe && cooked
+                    ? `<span class="cooked-label">✓ Cooked</span>`
+                    : ""
+                }
+            </div>
+
+            <div class="meal-row">
+
+                <select
+                    onchange="assignRecipe('${day}', this.value)"
+                    ${cooked ? "disabled" : ""}>
+
+                    <option value="">
+                        No dinner planned
+                    </option>
+
+                    ${data.recipes.map(r => `
+                        <option
+                            value="${r.id}"
+                            ${r.id == selectedRecipeId ? "selected" : ""}>
+                            ${escapeHTML(r.name)}
+                        </option>
+                    `).join("")}
+
+                </select>
+
+                ${
+                    recipe && !cooked
+                    ? `
+                    <button
+                        class="primary-btn"
+                        onclick="markCooked('${day}')">
+                        Mark as Cooked
+                    </button>
+                    `
+                    : ""
+                }
+
+            </div>
+
+            <div id="status-${day}"></div>
+        `;
+
+        container.appendChild(dayBox);
+
+        if (recipe) {
+            renderMealStatus(day, recipe, cooked);
+        }
+    });
+
+    renderShoppingList();
+}
+
+
+function assignRecipe(day, recipeId) {
+
+    if (!recipeId) {
+
+        delete data.planner[day];
+        delete data.cooked[day];
+
+    } else {
+
+        data.planner[day] =
+            Number(recipeId);
+
+        data.cooked[day] = false;
+    }
+
+    save();
+
+    renderPlanner();
+}
+
+
+function renderMealStatus(day, recipe, cooked) {
+
+    const container =
+        document.getElementById(`status-${day}`);
+
+    if (!container) return;
+
+    const checks = recipe.ingredients.map(
+        ingredient => {
+
+            const available =
+                getInventoryAmount(ingredient.name);
+
+            const enough =
+                available >= ingredient.quantity;
+
+            return {
+                ...ingredient,
+                available,
+                enough
+            };
+        }
+    );
+
+    const allAvailable =
+        checks.every(item => item.enough);
+
+    container.className =
+        `meal-status ${allAvailable ? "good" : "missing"}`;
+
+    container.innerHTML = `
+
+        ${checks.map(item => `
+
+            <span class="ingredient-check
+                ${item.enough ? "good" : "missing"}">
+
+                ${item.enough ? "✓" : "✕"}
+
+                ${escapeHTML(item.name)}
+                —
+                needs ${item.quantity},
+                has ${item.available}
+
+            </span>
+
+        `).join("")}
+
+        ${
+            cooked
+            ? `<div class="cooked-label">
+                    ✓ Ingredients deducted from inventory
+               </div>`
+            : ""
+        }
+    `;
+}
+
+
+/* =========================================================
+   AUTO-DEDUCT
+========================================================= */
+
+function markCooked(day) {
+
+    const recipeId =
+        data.planner[day];
+
+    const recipe =
+        data.recipes.find(
+            r => r.id == recipeId
+        );
+
+    if (!recipe) return;
+
+    /*
+       Check everything first.
+       Nothing is deducted unless the full recipe
+       can be made.
+    */
+
+    for (const ingredient of recipe.ingredients) {
+
+        const available =
+            getInventoryAmount(ingredient.name);
+
+        if (available < ingredient.quantity) {
+
+            alert(
+                `You don't have enough ${ingredient.name} ` +
+                `to make ${recipe.name}.`
+            );
+
+            return;
+        }
+    }
+
+
+    /*
+       Deduct from inventory.
+
+       Items are consumed in Pantry/Freezer/Fridge order
+       according to the order in which they were added.
+    */
+
+    for (const ingredient of recipe.ingredients) {
+
+        let remaining =
+            ingredient.quantity;
+
+        const matchingItems =
+            data.inventory.filter(
+                item =>
+                    normalise(item.name) ===
+                    normalise(ingredient.name)
+            );
+
+        for (const item of matchingItems) {
+
+            if (remaining <= 0) break;
+
+            const deduction =
+                Math.min(
+                    Number(item.quantity),
+                    remaining
+                );
+
+            item.quantity -= deduction;
+            remaining -= deduction;
+        }
+    }
+
+    data.cooked[day] = true;
+
+    save();
+
+    renderInventory();
+    renderPlanner();
+}
+
+
+/* =========================================================
+   SHOPPING LIST
+========================================================= */
+
+function getShoppingList() {
+
+    const missing = {};
+
+    days.forEach(day => {
+
+        const recipeId =
+            data.planner[day];
+
+        const recipe =
+            data.recipes.find(
+                r => r.id == recipeId
+            );
+
+        if (!recipe) return;
+
+        /*
+           Once a meal is cooked, it no longer contributes
+           to the shopping list.
+        */
+
+        if (data.cooked[day]) return;
+
+        recipe.ingredients.forEach(ingredient => {
+
+            const available =
+                getInventoryAmount(ingredient.name);
+
+            const shortage =
+                Math.max(
+                    0,
+                    ingredient.quantity - available
+                );
+
+            if (shortage > 0) {
+
+                const key =
+                    normalise(ingredient.name);
+
+                if (!missing[key]) {
+
+                    missing[key] = {
+                        name: ingredient.name,
+                        quantity: 0
+                    };
+                }
+
+                /*
+                   This intentionally adds the shortage
+                   for each planned meal.
+                */
+
+                missing[key].quantity += shortage;
+            }
+        });
+    });
+
+    return Object.values(missing);
+}
+
+
+function renderShoppingList() {
+
+    const container =
+        document.getElementById("shoppingList");
+
+    const items =
+        getShoppingList();
+
+    if (!items.length) {
+
+        container.innerHTML =
+            `<div class="shopping-empty">
+                ✓ You have everything needed for your
+                planned dinners.
+             </div>`;
+
+        return;
+    }
+
+    container.innerHTML =
+        items.map(item => `
+            <div class="shopping-item">
+                ${escapeHTML(item.name)}
+                — ${cleanNumber(item.quantity)}
+            </div>
+        `).join("");
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function normalise(value) {
+
+    return String(value)
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, " ");
+}
+
+
+function escapeHTML(value) {
+
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function formatDate(dateString) {
+
+    const date =
+        new Date(dateString + "T00:00:00");
+
+    return date.toLocaleDateString(
+        undefined,
+        {
+            day: "numeric",
+            month: "short",
+            year: "numeric"
+        }
+    );
+}
+
+
+function cleanNumber(number) {
+
+    return Number(number)
+        .toFixed(2)
+        .replace(/\.00$/, "")
+        .replace(/(\.\d)0$/, "$1");
+}
+
+
+/* =========================================================
+   INITIALISE
+========================================================= */
+
+renderInventory();
+renderRecipes();
+renderPlanner();
+
+</script>
+
+</body>
+</html>
