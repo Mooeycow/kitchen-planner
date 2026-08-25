@@ -2,497 +2,620 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
 <meta name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      content="width=device-width, initial-scale=1.0,
+      maximum-scale=1.0, user-scalable=no">
+
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Kitchen Planner">
 <meta name="theme-color" content="#dfe8dc">
 
-<title>Kitchen Inventory & Dinner Planner</title>
+<title>Kitchen Planner</title>
 
 <style>
-    :root {
-        --sage: #9caf91;
-        --sage-dark: #718367;
-        --sage-light: #e5ecdf;
-        --beige: #f5f0e6;
-        --cream: #fbf9f4;
-        --brown: #665f53;
-        --dark: #3f4039;
-        --white: #ffffff;
-        --red: #c96d68;
-        --red-light: #f8e2df;
-        --green: #668b67;
-        --green-light: #e2efe2;
-        --border: #ded9cd;
-        --shadow: 0 3px 12px rgba(80,75,60,.08);
+:root {
+    --sage: #9caf91;
+    --sage-dark: #718367;
+    --sage-light: #e5ecdf;
+    --beige: #f5f0e6;
+    --cream: #fbf9f4;
+    --brown: #665f53;
+    --dark: #3f4039;
+    --white: #ffffff;
+    --red: #c96d68;
+    --red-light: #f8e2df;
+    --green: #668b67;
+    --green-light: #e2efe2;
+    --orange: #b88948;
+    --orange-light: #f5ead7;
+    --border: #ded9cd;
+    --shadow: 0 3px 12px rgba(80,75,60,.08);
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    background: var(--beige);
+    color: var(--dark);
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "SF Pro Display",
+        "Helvetica Neue",
+        Arial,
+        sans-serif;
+    font-size: 16px;
+}
+
+header {
+    background: var(--sage);
+    padding: 24px 28px;
+    color: white;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+header p {
+    margin: 6px 0 0;
+    opacity: .9;
+    font-size: 15px;
+}
+
+.app {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 22px;
+}
+
+.main-grid {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+    gap: 22px;
+    align-items: start;
+}
+
+.panel {
+    background: var(--cream);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(120,110,90,.08);
+}
+
+.panel-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.panel-title h2 {
+    margin: 0;
+    font-size: 22px;
+}
+
+.location-toggle {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    background: var(--sage-light);
+    border-radius: 13px;
+    padding: 4px;
+    margin-bottom: 20px;
+}
+
+.location-toggle button {
+    border: none;
+    background: transparent;
+    color: var(--sage-dark);
+    min-height: 48px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.location-toggle button.active {
+    background: var(--sage-dark);
+    color: white;
+}
+
+input,
+select,
+button {
+    font: inherit;
+}
+
+input,
+select {
+    width: 100%;
+    min-height: 48px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 12px;
+    background: white;
+    color: var(--dark);
+    outline: none;
+}
+
+input:focus,
+select:focus {
+    border-color: var(--sage-dark);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns:
+        1.4fr
+        .6fr
+        .7fr
+        .7fr
+        .9fr
+        auto;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn,
+.small-btn {
+    border: none;
+    border-radius: 10px;
+    min-height: 46px;
+    padding: 9px 15px;
+    cursor: pointer;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.primary-btn {
+    background: var(--sage-dark);
+    color: white;
+}
+
+.secondary-btn {
+    background: var(--sage-light);
+    color: var(--sage-dark);
+}
+
+.danger-btn {
+    background: var(--red-light);
+    color: var(--red);
+}
+
+.small-btn {
+    min-height: 38px;
+    padding: 7px 12px;
+    font-size: 14px;
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+.category {
+    margin-bottom: 22px;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 7px;
+    margin-bottom: 8px;
+}
+
+.category-header h3 {
+    margin: 0;
+    color: var(--sage-dark);
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+}
+
+.category-count {
+    color: #8d887c;
+    font-size: 13px;
+}
+
+.inventory-item {
+    display: grid;
+    grid-template-columns:
+        minmax(120px, 1fr)
+        auto
+        auto
+        auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 0;
+    border-bottom: 1px solid #ebe7de;
+}
+
+.item-name {
+    font-weight: 650;
+}
+
+.item-amount {
+    font-size: 14px;
+    color: var(--sage-dark);
+    font-weight: 600;
+    margin-top: 3px;
+}
+
+.expiry {
+    font-size: 12px;
+    color: #898477;
+    margin-top: 3px;
+}
+
+.expiry.expired {
+    color: var(--red);
+    font-weight: 600;
+}
+
+.low-stock {
+    color: var(--orange);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 3px;
+}
+
+.out-stock {
+    color: var(--red);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 3px;
+}
+
+.quantity {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.quantity button {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.quantity span {
+    min-width: 55px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.delete-btn {
+    border: none;
+    background: transparent;
+    color: #aaa398;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.edit-btn {
+    border: none;
+    background: var(--sage-light);
+    color: var(--sage-dark);
+    border-radius: 9px;
+    padding: 8px 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.empty {
+    color: #999286;
+    font-style: italic;
+    padding: 12px 0;
+}
+
+.recipe-form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.recipe-builder {
+    margin-bottom: 12px;
+}
+
+.ingredient-row {
+    display: grid;
+    grid-template-columns:
+        1fr
+        .5fr
+        .65fr
+        auto;
+    gap: 7px;
+    margin-bottom: 7px;
+}
+
+.recipe-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 14px;
+    margin-top: 10px;
+}
+
+.recipe-card-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+}
+
+.recipe-card h4 {
+    margin: 0;
+    font-size: 17px;
+}
+
+.recipe-ingredients {
+    margin: 10px 0 0;
+    padding-left: 18px;
+    color: #777165;
+}
+
+.section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+}
+
+.section h3 {
+    margin-top: 0;
+}
+
+.day {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    padding: 12px;
+    margin-bottom: 10px;
+}
+
+.day-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 9px;
+}
+
+.day-header strong {
+    color: var(--sage-dark);
+}
+
+.meal-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+}
+
+.meal-status {
+    margin-top: 10px;
+    padding: 9px 11px;
+    border-radius: 9px;
+    font-size: 14px;
+}
+
+.meal-status.good {
+    background: var(--green-light);
+    color: var(--green);
+}
+
+.meal-status.missing {
+    background: var(--red-light);
+    color: var(--red);
+}
+
+.ingredient-check {
+    display: block;
+    margin: 4px 0;
+}
+
+.ingredient-check.good {
+    color: var(--green);
+}
+
+.ingredient-check.missing {
+    color: var(--red);
+    font-weight: 600;
+}
+
+.ingredient-check.low {
+    color: var(--orange);
+}
+
+.cooked {
+    opacity: .6;
+}
+
+.cooked-label {
+    color: var(--green);
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 7px;
+}
+
+.shopping-list {
+    margin-top: 22px;
+}
+
+.shopping-list h3 {
+    margin: 0 0 12px;
+    font-size: 18px;
+}
+
+.shopping-item {
+    background: var(--red-light);
+    color: #8f4e4a;
+    border-radius: 10px;
+    padding: 10px 12px;
+    margin-bottom: 7px;
+    font-weight: 600;
+}
+
+.shopping-empty {
+    background: var(--green-light);
+    color: var(--green);
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(45,43,38,.35);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 1000;
+}
+
+.modal {
+    width: min(500px, 100%);
+    background: var(--cream);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.18);
+}
+
+.modal h3 {
+    margin-top: 0;
+}
+
+.modal-grid {
+    display: grid;
+    grid-template-columns:
+        1fr
+        .7fr
+        .7fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.help-text {
+    color: #898477;
+    font-size: 13px;
+    margin: 5px 0 14px;
+}
+
+@media(max-width:1100px) {
+    .form-grid {
+        grid-template-columns:
+            1fr
+            .6fr
+            .7fr
+            .7fr;
     }
 
-    * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
+    .form-grid button {
+        grid-column: span 2;
     }
+}
 
-    body {
-        margin: 0;
-        background: var(--beige);
-        color: var(--dark);
-        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
-                     "Helvetica Neue", Arial, sans-serif;
-        font-size: 16px;
+@media(max-width:950px) {
+    .main-grid {
+        grid-template-columns: 1fr;
     }
+}
 
+@media(max-width:650px) {
     header {
-        background: var(--sage);
-        padding: 24px 28px;
-        color: white;
+        padding: 20px;
     }
 
     header h1 {
-        margin: 0;
-        font-size: 28px;
-        font-weight: 700;
-    }
-
-    header p {
-        margin: 6px 0 0;
-        opacity: .9;
-        font-size: 15px;
+        font-size: 23px;
     }
 
     .app {
-        max-width: 1500px;
-        margin: 0 auto;
-        padding: 22px;
-    }
-
-    /* Main dual-column layout */
-
-    .main-grid {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        gap: 22px;
-        align-items: start;
+        padding: 12px;
     }
 
     .panel {
-        background: var(--cream);
-        border-radius: 18px;
-        padding: 20px;
-        box-shadow: var(--shadow);
-        border: 1px solid rgba(120,110,90,.08);
-    }
-
-    .panel-title {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        margin-bottom: 18px;
-    }
-
-    .panel-title h2 {
-        margin: 0;
-        font-size: 22px;
-    }
-
-    /* Location toggle */
-
-    .location-toggle {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        background: var(--sage-light);
-        border-radius: 13px;
-        padding: 4px;
-        margin-bottom: 20px;
-    }
-
-    .location-toggle button {
-        border: none;
-        background: transparent;
-        color: var(--sage-dark);
-        min-height: 48px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: 15px;
-        cursor: pointer;
-    }
-
-    .location-toggle button.active {
-        background: var(--sage-dark);
-        color: white;
-    }
-
-    /* Forms */
-
-    input, select, button {
-        font: inherit;
-    }
-
-    input, select {
-        width: 100%;
-        min-height: 48px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 10px 12px;
-        background: white;
-        color: var(--dark);
-        outline: none;
-    }
-
-    input:focus, select:focus {
-        border-color: var(--sage-dark);
+        padding: 15px;
+        border-radius: 14px;
     }
 
     .form-grid {
-        display: grid;
-        grid-template-columns: 1.4fr .6fr .8fr .9fr auto;
-        gap: 8px;
-        margin-bottom: 20px;
+        grid-template-columns: 1fr;
     }
 
-    .primary-btn,
-    .secondary-btn,
-    .danger-btn,
-    .small-btn {
-        border: none;
-        border-radius: 10px;
-        min-height: 46px;
-        padding: 9px 15px;
-        cursor: pointer;
-        font-weight: 600;
-        white-space: nowrap;
-    }
-
-    .primary-btn {
-        background: var(--sage-dark);
-        color: white;
-    }
-
-    .secondary-btn {
-        background: var(--sage-light);
-        color: var(--sage-dark);
-    }
-
-    .danger-btn {
-        background: var(--red-light);
-        color: var(--red);
-    }
-
-    .small-btn {
-        min-height: 38px;
-        padding: 7px 12px;
-        font-size: 14px;
-    }
-
-    button:active {
-        transform: scale(.98);
-    }
-
-    /* Category sections */
-
-    .category {
-        margin-bottom: 22px;
-    }
-
-    .category-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid var(--border);
-        padding-bottom: 7px;
-        margin-bottom: 8px;
-    }
-
-    .category-header h3 {
-        margin: 0;
-        color: var(--sage-dark);
-        font-size: 15px;
-        text-transform: uppercase;
-        letter-spacing: .07em;
-    }
-
-    .category-count {
-        color: #8d887c;
-        font-size: 13px;
+    .form-grid button {
+        grid-column: auto;
     }
 
     .inventory-item {
-        display: grid;
-        grid-template-columns: minmax(100px, 1fr) auto auto auto;
-        align-items: center;
-        gap: 9px;
-        padding: 10px 0;
-        border-bottom: 1px solid #ebe7de;
-    }
-
-    .item-name {
-        font-weight: 600;
-    }
-
-    .expiry {
-        font-size: 12px;
-        color: #898477;
-        margin-top: 3px;
-    }
-
-    .expiry.expired {
-        color: var(--red);
-        font-weight: 600;
-    }
-
-    .quantity {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-    }
-
-    .quantity button {
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        border: none;
-        background: var(--sage-light);
-        color: var(--sage-dark);
-        font-size: 22px;
-        cursor: pointer;
-    }
-
-    .quantity span {
-        min-width: 25px;
-        text-align: center;
-        font-weight: 700;
-    }
-
-    .delete-btn {
-        border: none;
-        background: transparent;
-        color: #aaa398;
-        font-size: 20px;
-        cursor: pointer;
-        padding: 8px;
-    }
-
-    .empty {
-        color: #999286;
-        font-style: italic;
-        padding: 12px 0;
-    }
-
-    /* Recipes */
-
-    .recipe-form {
-        display: grid;
         grid-template-columns: 1fr auto;
-        gap: 8px;
-        margin-bottom: 12px;
     }
 
-    .ingredient-row {
-        display: grid;
-        grid-template-columns: 1fr .45fr auto;
-        gap: 7px;
-        margin-bottom: 7px;
+    .inventory-item .quantity {
+        grid-column: 2;
+        grid-row: 1 / span 2;
     }
 
-    .recipe-card {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 13px;
-        padding: 14px;
-        margin-top: 10px;
+    .inventory-item .edit-btn {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: start;
     }
 
-    .recipe-card-header {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .recipe-card h4 {
-        margin: 0;
-        font-size: 17px;
-    }
-
-    .recipe-ingredients {
-        margin: 10px 0 0;
-        padding-left: 18px;
-        color: #777165;
-    }
-
-    /* Planner */
-
-    .day {
-        background: white;
-        border: 1px solid var(--border);
-        border-radius: 13px;
-        padding: 12px;
-        margin-bottom: 10px;
-    }
-
-    .day-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 9px;
-    }
-
-    .day-header strong {
-        color: var(--sage-dark);
+    .inventory-item .delete-btn {
+        grid-column: 2;
+        grid-row: 2;
+        justify-self: end;
     }
 
     .meal-row {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 8px;
+        grid-template-columns: 1fr;
     }
 
-    .meal-status {
-        margin-top: 10px;
-        padding: 9px 11px;
-        border-radius: 9px;
-        font-size: 14px;
+    .ingredient-row {
+        grid-template-columns:
+            1fr
+            .6fr
+            .7fr
+            auto;
     }
 
-    .meal-status.good {
-        background: var(--green-light);
-        color: var(--green);
+    .modal-grid {
+        grid-template-columns: 1fr 1fr;
     }
 
-    .meal-status.missing {
-        background: var(--red-light);
-        color: var(--red);
+    .modal-grid input:first-child {
+        grid-column: span 2;
     }
-
-    .ingredient-check {
-        display: block;
-        margin: 3px 0;
-    }
-
-    .ingredient-check.good {
-        color: var(--green);
-    }
-
-    .ingredient-check.missing {
-        color: var(--red);
-        font-weight: 600;
-    }
-
-    .cooked {
-        opacity: .6;
-    }
-
-    .cooked-label {
-        color: var(--green);
-        font-size: 13px;
-        font-weight: 600;
-        margin-top: 7px;
-    }
-
-    /* Shopping list */
-
-    .shopping-list {
-        margin-top: 22px;
-    }
-
-    .shopping-list h3 {
-        margin: 0 0 12px;
-        font-size: 18px;
-    }
-
-    .shopping-item {
-        background: var(--red-light);
-        color: #8f4e4a;
-        border-radius: 10px;
-        padding: 10px 12px;
-        margin-bottom: 7px;
-        font-weight: 600;
-    }
-
-    .shopping-empty {
-        background: var(--green-light);
-        color: var(--green);
-        padding: 12px;
-        border-radius: 10px;
-    }
-
-    /* Section separator */
-
-    .section {
-        margin-top: 25px;
-        padding-top: 20px;
-        border-top: 1px solid var(--border);
-    }
-
-    .section h3 {
-        margin-top: 0;
-    }
-
-    /* Tablet / iPad portrait */
-
-    @media (max-width: 950px) {
-        .main-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .form-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .form-grid button {
-            grid-column: span 2;
-        }
-    }
-
-    /* Phones */
-
-    @media (max-width: 600px) {
-        header {
-            padding: 20px;
-        }
-
-        header h1 {
-            font-size: 23px;
-        }
-
-        .app {
-            padding: 12px;
-        }
-
-        .panel {
-            padding: 15px;
-            border-radius: 14px;
-        }
-
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .form-grid button {
-            grid-column: auto;
-        }
-
-        .inventory-item {
-            grid-template-columns: 1fr auto;
-        }
-
-        .inventory-item .quantity {
-            grid-column: 2;
-            grid-row: 1 / span 2;
-        }
-
-        .inventory-item .delete-btn {
-            grid-column: 1;
-            grid-row: 2;
-            justify-self: start;
-        }
-
-        .meal-row {
-            grid-template-columns: 1fr;
-        }
-    }
+}
 </style>
 </head>
 
@@ -505,112 +628,234 @@
 
 <div class="app">
 
-    <div class="main-grid">
+<div class="main-grid">
 
-        <!-- ================= INVENTORY ================= -->
+<!-- INVENTORY -->
 
-        <section class="panel">
+<section class="panel">
 
-            <div class="panel-title">
-                <h2>Inventory</h2>
-            </div>
+    <div class="panel-title">
+        <h2>Inventory</h2>
+    </div>
 
-            <div class="location-toggle">
-                <button class="active" onclick="switchLocation('Pantry', this)">Pantry</button>
-                <button onclick="switchLocation('Freezer', this)">Freezer</button>
-                <button onclick="switchLocation('Fridge', this)">Fridge</button>
-            </div>
+    <div class="location-toggle">
+        <button class="active"
+                onclick="switchLocation('Pantry', this)">
+            Pantry
+        </button>
 
-            <div class="form-grid">
+        <button onclick="switchLocation('Freezer', this)">
+            Freezer
+        </button>
 
-                <input
-                    id="itemName"
-                    type="text"
-                    placeholder="Item name">
+        <button onclick="switchLocation('Fridge', this)">
+            Fridge
+        </button>
+    </div>
 
-                <input
-                    id="itemQty"
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value="1"
-                    placeholder="Qty">
+    <div class="form-grid">
 
-                <input
-                    id="itemExpiry"
-                    type="date">
+        <input
+            id="itemName"
+            type="text"
+            placeholder="Item name">
 
-                <select id="itemCategory">
-                    <option>Dairy</option>
-                    <option>Spices</option>
-                    <option>Vegetables</option>
-                    <option>Grains</option>
-                    <option>Meat</option>
-                    <option>Canned Goods</option>
-                    <option>Other</option>
-                </select>
+        <input
+            id="itemQty"
+            type="number"
+            min="0"
+            step="0.01"
+            value="1"
+            placeholder="Qty">
 
-                <button class="primary-btn" onclick="addItem()">
-                    + Add Item
-                </button>
+        <select id="itemUnit">
+            <option value="g">g</option>
+            <option value="kg">kg</option>
+            <option value="ml">ml</option>
+            <option value="L">L</option>
+            <option value="pieces">pieces</option>
+        </select>
 
-            </div>
+        <input
+            id="itemExpiry"
+            type="date">
 
-            <div id="inventoryList"></div>
+        <select id="itemCategory">
+            <option>Dairy</option>
+            <option>Spices</option>
+            <option>Vegetables</option>
+            <option>Grains</option>
+            <option>Meat</option>
+            <option>Canned Goods</option>
+            <option>Other</option>
+        </select>
 
-        </section>
+        <button class="primary-btn"
+                onclick="addItem()">
+            + Add Item
+        </button>
 
+    </div>
 
-        <!-- ================= RIGHT COLUMN ================= -->
+    <p class="help-text">
+        Tip: use the same type of unit in your recipes.
+        The app automatically converts g/kg and ml/L.
+    </p>
 
-        <section class="panel">
+    <div id="inventoryList"></div>
 
-            <!-- RECIPES -->
-
-            <div class="panel-title">
-                <h2>Recipes</h2>
-            </div>
-
-            <div class="recipe-form">
-                <input
-                    id="recipeName"
-                    type="text"
-                    placeholder="Recipe name">
-
-                <button class="primary-btn" onclick="startRecipe()">
-                    + Recipe
-                </button>
-            </div>
-
-            <div id="recipeBuilder"></div>
-
-            <div id="recipesList"></div>
+</section>
 
 
-            <!-- DINNER PLANNER -->
+<!-- RIGHT COLUMN -->
 
-            <div class="section">
+<section class="panel">
 
-                <div class="panel-title">
-                    <h2>Weekly Dinner Planner</h2>
-                </div>
+    <!-- RECIPES -->
 
-                <div id="planner"></div>
+    <div class="panel-title">
+        <h2>Recipes</h2>
+    </div>
 
-            </div>
+    <div class="recipe-form">
+
+        <input
+            id="recipeName"
+            type="text"
+            placeholder="Recipe name">
+
+        <button class="primary-btn"
+                onclick="startRecipe()">
+            + Recipe
+        </button>
+
+    </div>
+
+    <div id="recipeBuilder"></div>
+
+    <div id="recipesList"></div>
 
 
-            <!-- SHOPPING LIST -->
+    <!-- DINNER PLANNER -->
 
-            <div class="shopping-list">
+    <div class="section">
 
-                <h3>🛒 Shopping List</h3>
+        <div class="panel-title">
+            <h2>Weekly Dinner Planner</h2>
+        </div>
 
-                <div id="shoppingList"></div>
+        <div id="planner"></div>
 
-            </div>
+    </div>
 
-        </section>
+
+    <!-- SHOPPING LIST -->
+
+    <div class="shopping-list">
+
+        <h3>🛒 Shopping List</h3>
+
+        <div id="shoppingList"></div>
+
+    </div>
+
+</section>
+
+</div>
+</div>
+
+
+<!-- EDIT MODAL -->
+
+<div class="modal-overlay" id="editModal">
+
+    <div class="modal">
+
+        <h3>Edit Inventory Item</h3>
+
+        <input id="editId" type="hidden">
+
+        <div class="modal-grid">
+
+            <input
+                id="editName"
+                type="text"
+                placeholder="Item name">
+
+            <input
+                id="editQty"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Quantity">
+
+            <select id="editUnit">
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="L">L</option>
+                <option value="pieces">pieces</option>
+            </select>
+
+        </div>
+
+        <label>Expiry date</label>
+
+        <input
+            id="editExpiry"
+            type="date"
+            style="margin:6px 0 12px">
+
+        <label>Category</label>
+
+        <select
+            id="editCategory"
+            style="margin:6px 0 14px">
+
+            <option>Dairy</option>
+            <option>Spices</option>
+            <option>Vegetables</option>
+            <option>Grains</option>
+            <option>Meat</option>
+            <option>Canned Goods</option>
+            <option>Other</option>
+
+        </select>
+
+        <label>Low-stock warning at</label>
+
+        <div class="modal-grid" style="margin-top:6px">
+
+            <input
+                id="editLowStock"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="e.g. 250">
+
+            <select id="editLowUnit">
+                <option value="g">g</option>
+                <option value="kg">kg</option>
+                <option value="ml">ml</option>
+                <option value="L">L</option>
+                <option value="pieces">pieces</option>
+            </select>
+
+        </div>
+
+        <div class="modal-actions">
+
+            <button class="secondary-btn"
+                    onclick="closeEdit()">
+                Cancel
+            </button>
+
+            <button class="primary-btn"
+                    onclick="saveEdit()">
+                Save Changes
+            </button>
+
+        </div>
 
     </div>
 
@@ -620,7 +865,7 @@
 <script>
 
 /* =========================================================
-   DATA
+   BASIC DATA
 ========================================================= */
 
 const categories = [
@@ -633,12 +878,6 @@ const categories = [
     "Other"
 ];
 
-const locations = [
-    "Pantry",
-    "Freezer",
-    "Fridge"
-];
-
 const days = [
     "Monday",
     "Tuesday",
@@ -649,14 +888,15 @@ const days = [
     "Sunday"
 ];
 
-let data = JSON.parse(
-    localStorage.getItem("kitchenPlannerData")
-) || {
-    inventory: [],
-    recipes: [],
-    planner: {},
-    cooked: {}
-};
+let data =
+    JSON.parse(
+        localStorage.getItem("kitchenPlannerData")
+    ) || {
+        inventory: [],
+        recipes: [],
+        planner: {},
+        cooked: {}
+    };
 
 let currentLocation = "Pantry";
 
@@ -668,10 +908,82 @@ let buildingRecipe = null;
 ========================================================= */
 
 function save() {
+
     localStorage.setItem(
         "kitchenPlannerData",
         JSON.stringify(data)
     );
+
+}
+
+
+/* =========================================================
+   UNIT CONVERSION
+========================================================= */
+
+function unitFamily(unit) {
+
+    if (unit === "g" || unit === "kg") {
+        return "weight";
+    }
+
+    if (unit === "ml" || unit === "L") {
+        return "volume";
+    }
+
+    return "count";
+}
+
+
+function toBase(quantity, unit) {
+
+    quantity = Number(quantity);
+
+    if (unit === "kg") {
+        return quantity * 1000;
+    }
+
+    if (unit === "L") {
+        return quantity * 1000;
+    }
+
+    return quantity;
+}
+
+
+function fromBase(quantity, unit) {
+
+    quantity = Number(quantity);
+
+    if (unit === "kg") {
+        return quantity / 1000;
+    }
+
+    if (unit === "L") {
+        return quantity / 1000;
+    }
+
+    return quantity;
+}
+
+
+function canConvert(unitA, unitB) {
+
+    return unitFamily(unitA) === unitFamily(unitB);
+
+}
+
+
+function formatQuantity(quantity, unit) {
+
+    quantity = Number(quantity);
+
+    if (Math.abs(quantity - Math.round(quantity)) < 0.0001) {
+        return Math.round(quantity) + " " + unit;
+    }
+
+    return Number(quantity.toFixed(2)) + " " + unit;
+
 }
 
 
@@ -690,88 +1002,232 @@ function switchLocation(location, button) {
     button.classList.add("active");
 
     renderInventory();
+
 }
 
 
 function addItem() {
 
-    const name = document
-        .getElementById("itemName")
-        .value
-        .trim();
+    const name =
+        document.getElementById("itemName")
+        .value.trim();
 
-    const quantity = parseFloat(
-        document.getElementById("itemQty").value
-    );
+    const quantity =
+        parseFloat(
+            document.getElementById("itemQty").value
+        );
 
-    const expiry = document
-        .getElementById("itemExpiry")
-        .value;
+    const unit =
+        document.getElementById("itemUnit").value;
 
-    const category = document
-        .getElementById("itemCategory")
-        .value;
+    const expiry =
+        document.getElementById("itemExpiry").value;
 
-    if (!name || isNaN(quantity)) {
-        alert("Please enter an item name and quantity.");
+    const category =
+        document.getElementById("itemCategory").value;
+
+    if (!name || isNaN(quantity) || quantity < 0) {
+
+        alert(
+            "Please enter an item name and quantity."
+        );
+
         return;
     }
 
     data.inventory.push({
-        id: Date.now(),
-        name,
-        quantity,
-        expiry,
-        category,
-        location: currentLocation
+
+        id: Date.now() + Math.random(),
+
+        name: name,
+
+        quantity: quantity,
+
+        unit: unit,
+
+        expiry: expiry,
+
+        category: category,
+
+        location: currentLocation,
+
+        lowStock: 0,
+
+        lowStockUnit: unit
+
     });
 
     save();
 
     document.getElementById("itemName").value = "";
+
     document.getElementById("itemQty").value = "1";
+
     document.getElementById("itemExpiry").value = "";
 
     renderInventory();
+
     renderPlanner();
+
 }
 
 
 function changeQuantity(id, amount) {
 
-    const item = data.inventory.find(
-        item => item.id === id
-    );
+    const item =
+        data.inventory.find(
+            item => item.id === id
+        );
 
     if (!item) return;
 
-    item.quantity = Math.max(
-        0,
-        Number(item.quantity) + amount
-    );
+    item.quantity =
+        Math.max(
+            0,
+            Number(item.quantity) + amount
+        );
 
     save();
 
     renderInventory();
+
     renderPlanner();
+
 }
 
 
 function deleteItem(id) {
 
-    data.inventory = data.inventory.filter(
-        item => item.id !== id
-    );
+    if (
+        !confirm(
+            "Delete this inventory item?"
+        )
+    ) {
+        return;
+    }
+
+    data.inventory =
+        data.inventory.filter(
+            item => item.id !== id
+        );
 
     save();
 
     renderInventory();
+
     renderPlanner();
+
 }
 
 
 /* =========================================================
-   INVENTORY RENDER
+   EDIT INVENTORY
+========================================================= */
+
+function openEdit(id) {
+
+    const item =
+        data.inventory.find(
+            item => item.id === id
+        );
+
+    if (!item) return;
+
+    document.getElementById("editId").value =
+        item.id;
+
+    document.getElementById("editName").value =
+        item.name;
+
+    document.getElementById("editQty").value =
+        item.quantity;
+
+    document.getElementById("editUnit").value =
+        item.unit || "pieces";
+
+    document.getElementById("editExpiry").value =
+        item.expiry || "";
+
+    document.getElementById("editCategory").value =
+        item.category || "Other";
+
+    document.getElementById("editLowStock").value =
+        item.lowStock || "";
+
+    document.getElementById("editLowUnit").value =
+        item.lowStockUnit ||
+        item.unit ||
+        "pieces";
+
+    document.getElementById("editModal").style.display =
+        "flex";
+
+}
+
+
+function closeEdit() {
+
+    document.getElementById("editModal").style.display =
+        "none";
+
+}
+
+
+function saveEdit() {
+
+    const id =
+        Number(
+            document.getElementById("editId").value
+        );
+
+    const item =
+        data.inventory.find(
+            item => item.id === id
+        );
+
+    if (!item) return;
+
+    const newUnit =
+        document.getElementById("editUnit").value;
+
+    item.name =
+        document.getElementById("editName")
+        .value.trim();
+
+    item.quantity =
+        Number(
+            document.getElementById("editQty").value
+        );
+
+    item.unit = newUnit;
+
+    item.expiry =
+        document.getElementById("editExpiry").value;
+
+    item.category =
+        document.getElementById("editCategory").value;
+
+    item.lowStock =
+        Number(
+            document.getElementById("editLowStock").value
+        ) || 0;
+
+    item.lowStockUnit =
+        document.getElementById("editLowUnit").value;
+
+    save();
+
+    closeEdit();
+
+    renderInventory();
+
+    renderPlanner();
+
+}
+
+
+/* =========================================================
+   INVENTORY DISPLAY
 ========================================================= */
 
 function renderInventory() {
@@ -781,99 +1237,242 @@ function renderInventory() {
 
     container.innerHTML = "";
 
-    const items = data.inventory.filter(
-        item => item.location === currentLocation
-    );
+    const items =
+        data.inventory.filter(
+            item =>
+                item.location === currentLocation
+        );
 
     if (!items.length) {
+
         container.innerHTML =
             `<div class="empty">
                 No items in the ${currentLocation.toLowerCase()} yet.
-             </div>`;
+            </div>`;
+
         return;
     }
 
     categories.forEach(category => {
 
-        const categoryItems = items.filter(
-            item => item.category === category
-        );
+        const categoryItems =
+            items.filter(
+                item =>
+                    item.category === category
+            );
 
         if (!categoryItems.length) return;
 
-        const section = document.createElement("div");
+        const section =
+            document.createElement("div");
+
         section.className = "category";
 
         section.innerHTML = `
+
             <div class="category-header">
-                <h3>${escapeHTML(category)}</h3>
+
+                <h3>
+                    ${escapeHTML(category)}
+                </h3>
+
                 <span class="category-count">
                     ${categoryItems.length}
                 </span>
+
             </div>
         `;
 
         categoryItems.forEach(item => {
 
-            const row = document.createElement("div");
-            row.className = "inventory-item";
+            const row =
+                document.createElement("div");
+
+            row.className =
+                "inventory-item";
 
             let expiryText = "";
 
             if (item.expiry) {
 
-                const today = new Date();
+                const today =
+                    new Date();
+
                 today.setHours(0,0,0,0);
 
                 const expiryDate =
-                    new Date(item.expiry + "T00:00:00");
+                    new Date(
+                        item.expiry + "T00:00:00"
+                    );
 
                 const expired =
                     expiryDate < today;
 
-                expiryText = `
-                    <div class="expiry ${expired ? "expired" : ""}">
-                        ${expired ? "Expired · " : "Expires · "}
+                expiryText =
+                    `<div class="expiry ${
+                        expired ? "expired" : ""
+                    }">
+                        ${
+                            expired
+                            ? "Expired · "
+                            : "Expires · "
+                        }
                         ${formatDate(item.expiry)}
-                    </div>
-                `;
+                    </div>`;
+            }
+
+            let stockMessage = "";
+
+            if (Number(item.quantity) <= 0) {
+
+                stockMessage =
+                    `<div class="out-stock">
+                        Out of stock
+                    </div>`;
+
+            } else if (item.lowStock > 0) {
+
+                const currentBase =
+                    toBase(
+                        item.quantity,
+                        item.unit
+                    );
+
+                const lowBase =
+                    toBase(
+                        item.lowStock,
+                        item.lowStockUnit ||
+                        item.unit
+                    );
+
+                if (currentBase <= lowBase) {
+
+                    stockMessage =
+                        `<div class="low-stock">
+                            Running low
+                        </div>`;
+                }
             }
 
             row.innerHTML = `
+
                 <div>
+
                     <div class="item-name">
                         ${escapeHTML(item.name)}
                     </div>
+
+                    <div class="item-amount">
+                        ${formatQuantity(
+                            item.quantity,
+                            item.unit || "pieces"
+                        )}
+                    </div>
+
                     ${expiryText}
+
+                    ${stockMessage}
+
                 </div>
 
+
                 <div class="quantity">
+
                     <button
-                        onclick="changeQuantity(${item.id}, -1)">
+                        onclick="changeQuantity(
+                            ${item.id}, -1
+                        )">
                         −
                     </button>
 
-                    <span>${item.quantity}</span>
+                    <span>
+                        ${cleanNumber(item.quantity)}
+                    </span>
 
                     <button
-                        onclick="changeQuantity(${item.id}, 1)">
+                        onclick="changeQuantity(
+                            ${item.id}, 1
+                        )">
                         +
                     </button>
+
                 </div>
+
+
+                <button
+                    class="edit-btn"
+                    onclick="openEdit(${item.id})">
+                    Edit
+                </button>
+
 
                 <button
                     class="delete-btn"
-                    title="Delete"
                     onclick="deleteItem(${item.id})">
                     ×
                 </button>
+
             `;
 
             section.appendChild(row);
+
         });
 
         container.appendChild(section);
+
     });
+
+}
+
+
+/* =========================================================
+   INVENTORY CALCULATION
+========================================================= */
+
+function getInventoryMatches(name) {
+
+    return data.inventory.filter(
+
+        item =>
+            normalise(item.name) ===
+            normalise(name)
+
+    );
+
+}
+
+
+function getInventoryAmount(name, recipeUnit) {
+
+    const matches =
+        getInventoryMatches(name);
+
+    let total = 0;
+
+    for (const item of matches) {
+
+        if (
+            canConvert(
+                item.unit || "pieces",
+                recipeUnit
+            )
+        ) {
+
+            total +=
+                toBase(
+                    item.quantity,
+                    item.unit || "pieces"
+                );
+
+        }
+
+    }
+
+    return fromBase(
+        total,
+        recipeUnit
+    );
+
 }
 
 
@@ -883,46 +1482,61 @@ function renderInventory() {
 
 function startRecipe() {
 
-    const name = document
-        .getElementById("recipeName")
-        .value
-        .trim();
+    const name =
+        document.getElementById("recipeName")
+        .value.trim();
 
     if (!name) {
-        alert("Please enter a recipe name.");
+
+        alert(
+            "Please enter a recipe name."
+        );
+
         return;
     }
 
     buildingRecipe = {
-        name,
+
+        name: name,
+
         ingredients: []
+
     };
 
     document.getElementById("recipeName").value = "";
 
     renderRecipeBuilder();
+
 }
 
 
 function renderRecipeBuilder() {
 
     const container =
-        document.getElementById("recipeBuilder");
+        document.getElementById(
+            "recipeBuilder"
+        );
 
     if (!buildingRecipe) {
+
         container.innerHTML = "";
+
         return;
     }
 
     container.innerHTML = `
+
         <div class="recipe-card">
 
             <h4>
-                ${escapeHTML(buildingRecipe.name)}
+                ${escapeHTML(
+                    buildingRecipe.name
+                )}
             </h4>
 
-            <p style="color:#888;margin:7px 0 12px;">
-                Add the ingredients and quantities required.
+            <p class="help-text">
+                Add each ingredient,
+                quantity and unit.
             </p>
 
             <div id="ingredientRows"></div>
@@ -935,14 +1549,14 @@ function renderRecipeBuilder() {
 
             <button
                 class="primary-btn small-btn"
-                style="margin-left:5px;"
+                style="margin-left:5px"
                 onclick="saveRecipe()">
                 Save Recipe
             </button>
 
             <button
                 class="danger-btn small-btn"
-                style="margin-left:5px;"
+                style="margin-left:5px"
                 onclick="cancelRecipe()">
                 Cancel
             </button>
@@ -951,78 +1565,142 @@ function renderRecipeBuilder() {
     `;
 
     addIngredientRow();
+
 }
 
 
 function addIngredientRow() {
 
     const container =
-        document.getElementById("ingredientRows");
+        document.getElementById(
+            "ingredientRows"
+        );
 
     if (!container) return;
 
-    const row = document.createElement("div");
-    row.className = "ingredient-row";
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "ingredient-row";
 
     row.innerHTML = `
+
         <input
             class="ingredient-name"
             type="text"
-            placeholder="e.g. Chicken Breasts">
+            placeholder="e.g. Rice">
 
         <input
             class="ingredient-qty"
             type="number"
-            min="0.1"
-            step="0.1"
+            min="0.01"
+            step="0.01"
             value="1"
             placeholder="Qty">
 
+        <select class="ingredient-unit">
+
+            <option value="g">g</option>
+
+            <option value="kg">kg</option>
+
+            <option value="ml">ml</option>
+
+            <option value="L">L</option>
+
+            <option value="pieces">
+                pieces
+            </option>
+
+        </select>
+
         <button
             class="danger-btn small-btn"
-            onclick="this.parentElement.remove()">
+            onclick="
+                this.parentElement.remove()
+            ">
             ×
         </button>
+
     `;
 
     container.appendChild(row);
+
 }
 
 
 function saveRecipe() {
 
     const names =
-        document.querySelectorAll(".ingredient-name");
+        document.querySelectorAll(
+            ".ingredient-name"
+        );
 
     const quantities =
-        document.querySelectorAll(".ingredient-qty");
+        document.querySelectorAll(
+            ".ingredient-qty"
+        );
+
+    const units =
+        document.querySelectorAll(
+            ".ingredient-unit"
+        );
 
     const ingredients = [];
 
-    names.forEach((input, index) => {
+    names.forEach(
+        (input, index) => {
 
-        const name = input.value.trim();
-        const quantity =
-            parseFloat(quantities[index].value);
+            const name =
+                input.value.trim();
 
-        if (name && !isNaN(quantity)) {
+            const quantity =
+                parseFloat(
+                    quantities[index].value
+                );
 
-            ingredients.push({
-                name,
-                quantity
-            });
+            const unit =
+                units[index].value;
+
+            if (
+                name &&
+                !isNaN(quantity) &&
+                quantity > 0
+            ) {
+
+                ingredients.push({
+
+                    name: name,
+
+                    quantity: quantity,
+
+                    unit: unit
+
+                });
+
+            }
+
         }
-    });
+    );
 
     if (!ingredients.length) {
-        alert("Please add at least one ingredient.");
+
+        alert(
+            "Please add at least one ingredient."
+        );
+
         return;
     }
 
     data.recipes.push({
-        id: Date.now(),
+
+        id: Date.now() + Math.random(),
+
         name: buildingRecipe.name,
-        ingredients
+
+        ingredients: ingredients
+
     });
 
     buildingRecipe = null;
@@ -1030,8 +1708,11 @@ function saveRecipe() {
     save();
 
     renderRecipeBuilder();
+
     renderRecipes();
+
     renderPlanner();
+
 }
 
 
@@ -1040,21 +1721,36 @@ function cancelRecipe() {
     buildingRecipe = null;
 
     renderRecipeBuilder();
+
 }
 
 
 function deleteRecipe(id) {
 
-    data.recipes = data.recipes.filter(
-        recipe => recipe.id !== id
-    );
+    if (
+        !confirm(
+            "Delete this recipe?"
+        )
+    ) {
+        return;
+    }
 
-    /* Remove deleted recipe from planner */
+    data.recipes =
+        data.recipes.filter(
+            recipe =>
+                recipe.id !== id
+        );
 
     days.forEach(day => {
 
-        if (data.planner[day] === id) {
+        if (
+            data.planner[day] === id
+        ) {
+
             delete data.planner[day];
+
+            delete data.cooked[day];
+
         }
 
     });
@@ -1062,22 +1758,28 @@ function deleteRecipe(id) {
     save();
 
     renderRecipes();
+
     renderPlanner();
+
 }
 
 
 function renderRecipes() {
 
     const container =
-        document.getElementById("recipesList");
+        document.getElementById(
+            "recipesList"
+        );
 
     container.innerHTML = "";
 
     if (!data.recipes.length) {
+
         container.innerHTML =
             `<div class="empty">
                 No recipes added yet.
-             </div>`;
+            </div>`;
+
         return;
     }
 
@@ -1086,18 +1788,26 @@ function renderRecipes() {
         const card =
             document.createElement("div");
 
-        card.className = "recipe-card";
+        card.className =
+            "recipe-card";
 
         card.innerHTML = `
+
             <div class="recipe-card-header">
 
                 <h4>
-                    ${escapeHTML(recipe.name)}
+                    ${escapeHTML(
+                        recipe.name
+                    )}
                 </h4>
 
                 <button
                     class="danger-btn small-btn"
-                    onclick="deleteRecipe(${recipe.id})">
+                    onclick="
+                        deleteRecipe(
+                            ${recipe.id}
+                        )
+                    ">
                     Delete
                 </button>
 
@@ -1105,42 +1815,34 @@ function renderRecipes() {
 
             <ul class="recipe-ingredients">
 
-                ${recipe.ingredients.map(ingredient => `
-                    <li>
-                        ${ingredient.quantity}
-                        ×
-                        ${escapeHTML(ingredient.name)}
-                    </li>
-                `).join("")}
+                ${recipe.ingredients
+                    .map(
+                        ingredient => `
+
+                        <li>
+
+                            ${formatQuantity(
+                                ingredient.quantity,
+                                ingredient.unit ||
+                                "pieces"
+                            )}
+
+                            ${escapeHTML(
+                                ingredient.name
+                            )}
+
+                        </li>
+                    `
+                    )
+                    .join("")}
 
             </ul>
         `;
 
         container.appendChild(card);
+
     });
-}
 
-
-/* =========================================================
-   INVENTORY CALCULATION
-========================================================= */
-
-/*
-   Inventory is combined across Pantry, Freezer and Fridge.
-   This means recipes do not care where an ingredient lives.
-*/
-
-function getInventoryAmount(ingredientName) {
-
-    return data.inventory
-        .filter(item =>
-            normalise(item.name) === normalise(ingredientName)
-        )
-        .reduce(
-            (total, item) =>
-                total + Number(item.quantity),
-            0
-        );
 }
 
 
@@ -1148,10 +1850,36 @@ function getInventoryAmount(ingredientName) {
    PLANNER
 ========================================================= */
 
+function assignRecipe(day, recipeId) {
+
+    if (!recipeId) {
+
+        delete data.planner[day];
+
+        delete data.cooked[day];
+
+    } else {
+
+        data.planner[day] =
+            Number(recipeId);
+
+        data.cooked[day] = false;
+
+    }
+
+    save();
+
+    renderPlanner();
+
+}
+
+
 function renderPlanner() {
 
     const container =
-        document.getElementById("planner");
+        document.getElementById(
+            "planner"
+        );
 
     container.innerHTML = "";
 
@@ -1167,230 +1895,419 @@ function renderPlanner() {
 
         const recipe =
             data.recipes.find(
-                r => r.id == selectedRecipeId
+                r =>
+                    r.id == selectedRecipeId
             );
 
         const cooked =
             data.cooked[day] === true;
 
         dayBox.innerHTML = `
+
             <div class="day-header">
-                <strong>${day}</strong>
+
+                <strong>
+                    ${day}
+                </strong>
 
                 ${
                     recipe && cooked
-                    ? `<span class="cooked-label">✓ Cooked</span>`
-                    : ""
+                    ?
+                    `<span class="cooked-label">
+                        ✓ Cooked
+                    </span>`
+                    :
+                    ""
                 }
+
             </div>
+
 
             <div class="meal-row">
 
                 <select
-                    onchange="assignRecipe('${day}', this.value)"
+                    onchange="
+                        assignRecipe(
+                            '${day}',
+                            this.value
+                        )
+                    "
                     ${cooked ? "disabled" : ""}>
 
                     <option value="">
                         No dinner planned
                     </option>
 
-                    ${data.recipes.map(r => `
-                        <option
-                            value="${r.id}"
-                            ${r.id == selectedRecipeId ? "selected" : ""}>
-                            ${escapeHTML(r.name)}
-                        </option>
-                    `).join("")}
+                    ${data.recipes
+                        .map(
+                            r => `
+
+                            <option
+                                value="${r.id}"
+                                ${
+                                    r.id ==
+                                    selectedRecipeId
+                                    ? "selected"
+                                    : ""
+                                }>
+
+                                ${escapeHTML(
+                                    r.name
+                                )}
+
+                            </option>
+                        `
+                        )
+                        .join("")}
 
                 </select>
 
+
                 ${
                     recipe && !cooked
-                    ? `
-                    <button
+                    ?
+                    `<button
                         class="primary-btn"
-                        onclick="markCooked('${day}')">
+                        onclick="
+                            markCooked(
+                                '${day}'
+                            )
+                        ">
                         Mark as Cooked
-                    </button>
-                    `
-                    : ""
+                    </button>`
+                    :
+                    ""
                 }
 
             </div>
 
-            <div id="status-${day}"></div>
+
+            <div
+                id="status-${day}">
+            </div>
+
         `;
 
         container.appendChild(dayBox);
 
         if (recipe) {
-            renderMealStatus(day, recipe, cooked);
+
+            renderMealStatus(
+                day,
+                recipe,
+                cooked
+            );
+
         }
+
     });
 
     renderShoppingList();
-}
 
-
-function assignRecipe(day, recipeId) {
-
-    if (!recipeId) {
-
-        delete data.planner[day];
-        delete data.cooked[day];
-
-    } else {
-
-        data.planner[day] =
-            Number(recipeId);
-
-        data.cooked[day] = false;
-    }
-
-    save();
-
-    renderPlanner();
-}
-
-
-function renderMealStatus(day, recipe, cooked) {
-
-    const container =
-        document.getElementById(`status-${day}`);
-
-    if (!container) return;
-
-    const checks = recipe.ingredients.map(
-        ingredient => {
-
-            const available =
-                getInventoryAmount(ingredient.name);
-
-            const enough =
-                available >= ingredient.quantity;
-
-            return {
-                ...ingredient,
-                available,
-                enough
-            };
-        }
-    );
-
-    const allAvailable =
-        checks.every(item => item.enough);
-
-    container.className =
-        `meal-status ${allAvailable ? "good" : "missing"}`;
-
-    container.innerHTML = `
-
-        ${checks.map(item => `
-
-            <span class="ingredient-check
-                ${item.enough ? "good" : "missing"}">
-
-                ${item.enough ? "✓" : "✕"}
-
-                ${escapeHTML(item.name)}
-                —
-                needs ${item.quantity},
-                has ${item.available}
-
-            </span>
-
-        `).join("")}
-
-        ${
-            cooked
-            ? `<div class="cooked-label">
-                    ✓ Ingredients deducted from inventory
-               </div>`
-            : ""
-        }
-    `;
 }
 
 
 /* =========================================================
-   AUTO-DEDUCT
+   MEAL CHECKING
+========================================================= */
+
+function renderMealStatus(
+    day,
+    recipe,
+    cooked
+) {
+
+    const container =
+        document.getElementById(
+            `status-${day}`
+        );
+
+    if (!container) return;
+
+    const checks =
+        recipe.ingredients.map(
+            ingredient => {
+
+                const available =
+                    getInventoryAmount(
+                        ingredient.name,
+                        ingredient.unit
+                    );
+
+                return {
+
+                    ...ingredient,
+
+                    available:
+
+                        available,
+
+                    enough:
+
+                        available >=
+                        ingredient.quantity
+
+                };
+
+            }
+        );
+
+    const allAvailable =
+        checks.every(
+            ingredient =>
+                ingredient.enough
+        );
+
+    container.className =
+        `meal-status ${
+            allAvailable
+            ? "good"
+            : "missing"
+        }`;
+
+    container.innerHTML =
+
+        checks
+        .map(
+            ingredient => {
+
+                const difference =
+                    Math.max(
+                        0,
+                        ingredient.quantity -
+                        ingredient.available
+                    );
+
+                return `
+
+                    <span
+                        class="
+                            ingredient-check
+                            ${
+                                ingredient.enough
+                                ? "good"
+                                : "missing"
+                            }
+                        ">
+
+                        ${
+                            ingredient.enough
+                            ? "✓"
+                            : "✕"
+                        }
+
+                        ${escapeHTML(
+                            ingredient.name
+                        )}
+
+                        —
+
+                        needs
+                        ${formatQuantity(
+                            ingredient.quantity,
+                            ingredient.unit
+                        )}
+
+                        · has
+                        ${formatQuantity(
+                            ingredient.available,
+                            ingredient.unit
+                        )}
+
+                        ${
+                            !ingredient.enough
+                            ?
+                            `
+
+                            <strong>
+                                · short by
+                                ${formatQuantity(
+                                    difference,
+                                    ingredient.unit
+                                )}
+                            </strong>
+
+                            `
+                            :
+                            ""
+                        }
+
+                    </span>
+
+                `;
+
+            }
+        )
+        .join("")
+
+        +
+
+        (
+            cooked
+            ?
+
+            `<div class="cooked-label">
+                ✓ Ingredients deducted from inventory
+            </div>`
+
+            :
+
+            ""
+        );
+
+}
+
+
+/* =========================================================
+   MARK AS COOKED
 ========================================================= */
 
 function markCooked(day) {
 
-    const recipeId =
-        data.planner[day];
-
     const recipe =
         data.recipes.find(
-            r => r.id == recipeId
+            r =>
+                r.id ==
+                data.planner[day]
         );
 
     if (!recipe) return;
 
-    /*
-       Check everything first.
-       Nothing is deducted unless the full recipe
-       can be made.
-    */
 
-    for (const ingredient of recipe.ingredients) {
+    /* Check everything first */
+
+    for (
+        const ingredient
+        of recipe.ingredients
+    ) {
 
         const available =
-            getInventoryAmount(ingredient.name);
+            getInventoryAmount(
+                ingredient.name,
+                ingredient.unit
+            );
 
-        if (available < ingredient.quantity) {
+        if (
+            available <
+            ingredient.quantity
+        ) {
 
             alert(
-                `You don't have enough ${ingredient.name} ` +
-                `to make ${recipe.name}.`
+                `You don't have enough ${
+                    ingredient.name
+                } to make ${
+                    recipe.name
+                }.`
             );
 
             return;
         }
+
     }
 
 
-    /*
-       Deduct from inventory.
+    /* Deduct exact amounts */
 
-       Items are consumed in Pantry/Freezer/Fridge order
-       according to the order in which they were added.
-    */
+    for (
+        const ingredient
+        of recipe.ingredients
+    ) {
 
-    for (const ingredient of recipe.ingredients) {
+        deductIngredient(
+            ingredient.name,
+            ingredient.quantity,
+            ingredient.unit
+        );
 
-        let remaining =
-            ingredient.quantity;
-
-        const matchingItems =
-            data.inventory.filter(
-                item =>
-                    normalise(item.name) ===
-                    normalise(ingredient.name)
-            );
-
-        for (const item of matchingItems) {
-
-            if (remaining <= 0) break;
-
-            const deduction =
-                Math.min(
-                    Number(item.quantity),
-                    remaining
-                );
-
-            item.quantity -= deduction;
-            remaining -= deduction;
-        }
     }
+
 
     data.cooked[day] = true;
 
     save();
 
     renderInventory();
+
     renderPlanner();
+
+}
+
+
+/* =========================================================
+   EXACT INGREDIENT DEDUCTION
+========================================================= */
+
+function deductIngredient(
+    ingredientName,
+    requiredAmount,
+    requiredUnit
+) {
+
+    let remainingBase =
+        toBase(
+            requiredAmount,
+            requiredUnit
+        );
+
+    const matches =
+        getInventoryMatches(
+            ingredientName
+        );
+
+    for (
+        const item
+        of matches
+    ) {
+
+        if (
+            remainingBase <= 0
+        ) {
+            break;
+        }
+
+        const itemUnit =
+            item.unit ||
+            "pieces";
+
+        if (
+            !canConvert(
+                itemUnit,
+                requiredUnit
+            )
+        ) {
+            continue;
+        }
+
+        const itemBase =
+            toBase(
+                item.quantity,
+                itemUnit
+            );
+
+        const deduction =
+            Math.min(
+                itemBase,
+                remainingBase
+            );
+
+        const newBase =
+            itemBase -
+            deduction;
+
+        item.quantity =
+            Math.max(
+                0,
+                fromBase(
+                    newBase,
+                    itemUnit
+                )
+            );
+
+        remainingBase -=
+            deduction;
+
+    }
+
 }
 
 
@@ -1404,87 +2321,137 @@ function getShoppingList() {
 
     days.forEach(day => {
 
-        const recipeId =
-            data.planner[day];
-
         const recipe =
             data.recipes.find(
-                r => r.id == recipeId
+                r =>
+                    r.id ==
+                    data.planner[day]
             );
 
-        if (!recipe) return;
+        if (
+            !recipe ||
+            data.cooked[day]
+        ) {
+            return;
+        }
 
-        /*
-           Once a meal is cooked, it no longer contributes
-           to the shopping list.
-        */
+        recipe.ingredients.forEach(
+            ingredient => {
 
-        if (data.cooked[day]) return;
+                const available =
+                    getInventoryAmount(
+                        ingredient.name,
+                        ingredient.unit
+                    );
 
-        recipe.ingredients.forEach(ingredient => {
+                const shortage =
+                    Math.max(
+                        0,
+                        ingredient.quantity -
+                        available
+                    );
 
-            const available =
-                getInventoryAmount(ingredient.name);
+                if (
+                    shortage > 0
+                ) {
 
-            const shortage =
-                Math.max(
-                    0,
-                    ingredient.quantity - available
-                );
+                    const key =
+                        normalise(
+                            ingredient.name
+                        )
+                        +
+                        "|"
+                        +
+                        ingredient.unit;
 
-            if (shortage > 0) {
+                    if (
+                        !missing[key]
+                    ) {
 
-                const key =
-                    normalise(ingredient.name);
+                        missing[key] = {
 
-                if (!missing[key]) {
+                            name:
+                                ingredient.name,
 
-                    missing[key] = {
-                        name: ingredient.name,
-                        quantity: 0
-                    };
+                            quantity:
+                                0,
+
+                            unit:
+                                ingredient.unit
+
+                        };
+
+                    }
+
+                    missing[key]
+                        .quantity +=
+                        shortage;
+
                 }
 
-                /*
-                   This intentionally adds the shortage
-                   for each planned meal.
-                */
-
-                missing[key].quantity += shortage;
             }
-        });
+        );
+
     });
 
-    return Object.values(missing);
+    return Object.values(
+        missing
+    );
+
 }
 
 
 function renderShoppingList() {
 
     const container =
-        document.getElementById("shoppingList");
+        document.getElementById(
+            "shoppingList"
+        );
 
     const items =
         getShoppingList();
 
     if (!items.length) {
 
-        container.innerHTML =
-            `<div class="shopping-empty">
-                ✓ You have everything needed for your
-                planned dinners.
-             </div>`;
+        container.innerHTML = `
+
+            <div class="shopping-empty">
+
+                ✓ You have everything needed
+                for your planned dinners.
+
+            </div>
+
+        `;
 
         return;
     }
 
     container.innerHTML =
-        items.map(item => `
-            <div class="shopping-item">
-                ${escapeHTML(item.name)}
-                — ${cleanNumber(item.quantity)}
-            </div>
-        `).join("");
+        items
+        .map(
+            item => `
+
+                <div class="shopping-item">
+
+                    ${escapeHTML(
+                        item.name
+                    )}
+
+                    —
+
+                    buy
+                    ${formatQuantity(
+                        item.quantity,
+                        item.unit
+                    )}
+
+                </div>
+
+            `
+        )
+        .join("");
+
 }
 
 
@@ -1498,6 +2465,7 @@ function normalise(value) {
         .trim()
         .toLowerCase()
         .replace(/\s+/g, " ");
+
 }
 
 
@@ -1509,15 +2477,17 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
 
 
-function formatDate(dateString) {
+function formatDate(
+    dateString
+) {
 
-    const date =
-        new Date(dateString + "T00:00:00");
-
-    return date.toLocaleDateString(
+    return new Date(
+        dateString + "T00:00:00"
+    ).toLocaleDateString(
         undefined,
         {
             day: "numeric",
@@ -1525,6 +2495,7 @@ function formatDate(dateString) {
             year: "numeric"
         }
     );
+
 }
 
 
@@ -1534,15 +2505,84 @@ function cleanNumber(number) {
         .toFixed(2)
         .replace(/\.00$/, "")
         .replace(/(\.\d)0$/, "$1");
+
 }
 
 
 /* =========================================================
-   INITIALISE
+   OLD DATA COMPATIBILITY
+========================================================= */
+
+/*
+   Your original app did not have units.
+
+   If you already had items saved,
+   this gives those older items a
+   "pieces" unit so they don't disappear.
+*/
+
+data.inventory.forEach(item => {
+
+    if (!item.unit) {
+
+        item.unit = "pieces";
+
+    }
+
+    if (
+        item.lowStock === undefined
+    ) {
+
+        item.lowStock = 0;
+
+    }
+
+    if (
+        !item.lowStockUnit
+    ) {
+
+        item.lowStockUnit =
+            item.unit;
+
+    }
+
+});
+
+
+/*
+   Older recipes also didn't have units.
+*/
+
+data.recipes.forEach(recipe => {
+
+    recipe.ingredients.forEach(
+        ingredient => {
+
+            if (
+                !ingredient.unit
+            ) {
+
+                ingredient.unit =
+                    "pieces";
+
+            }
+
+        }
+    );
+
+});
+
+save();
+
+
+/* =========================================================
+   START APP
 ========================================================= */
 
 renderInventory();
+
 renderRecipes();
+
 renderPlanner();
 
 </script>
